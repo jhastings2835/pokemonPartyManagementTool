@@ -11,9 +11,7 @@ import model.MPokemonEntity;
 
 public class MPokemonDao {
 
-	private final String selectMPokemon = "SELECT * FROM M_POKEMON";
-
-	private final String selectMPokemon = "SELECT * FROM M_POKEMON WHERE";
+	private final String selectMPokemon = "SELECT * FROM M_POKEMON ORDER BY NAME ASC";
 
 	List<MPokemonEntity> mPokemonList = new ArrayList<MPokemonEntity>();
 
@@ -30,11 +28,11 @@ public class MPokemonDao {
 				// ＩＤ
 				mPokemon.setId(rs.getString("ID"));
 				// すがたＩＤ
-				mPokemon.setId(rs.getString("FORM_ID"));
+				mPokemon.setFormId(rs.getString("FORM_ID"));
 				// 名前
 				mPokemon.setName(rs.getString("NAME"));
 				// すがたの要項
-				mPokemon.setId(rs.getString("FORM_REMARKS"));
+				mPokemon.setFormRemarks(rs.getString("FORM_REMARKS"));
 				// 作成したモデルをリストにつめる
 				mPokemonList.add(mPokemon);
 			}

@@ -1,6 +1,4 @@
-package controller;
-
-import model.DataBaseModel;
+package model;
 
 public class MPokemonAbilityEntity extends DataBaseModel {
 
