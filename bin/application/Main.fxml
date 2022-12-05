@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.Menu?>
+<?import javafx.scene.control.MenuBar?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.VBox?>
+
+<VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="491.0" prefWidth="652.0" xmlns="http://javafx.com/javafx/19" xmlns:fx="http://javafx.com/fxml/1" fx:controller="controller.MainController">
+   <children>
+      <MenuBar prefHeight="30.0" prefWidth="652.0">
+        <menus>
+          <Menu mnemonicParsing="false" text="File">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Close" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Edit">
+            <items>
+              <MenuItem mnemonicParsing="false" text="Delete" />
+            </items>
+          </Menu>
+          <Menu mnemonicParsing="false" text="Help">
+            <items>
+              <MenuItem mnemonicParsing="false" text="About" />
+            </items>
+          </Menu>
+        </menus>
+      </MenuBar>
+      <AnchorPane prefHeight="466.0" prefWidth="652.0">
+         <children>
+            <Button layoutX="14.0" layoutY="14.0" mnemonicParsing="false" onAction="#actLoad" text="検索/更新" />
+            <TableView fx:id="tableResultList" layoutX="14.0" layoutY="55.0" maxHeight="1.7976931348623157E308" maxWidth="1.7976931348623157E308" prefHeight="346.0" prefWidth="582.0" AnchorPane.bottomAnchor="63.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="56.0" AnchorPane.topAnchor="55.0">
+              <columns>
+                <TableColumn fx:id="id" prefWidth="75.0" text="ID" />
+                <TableColumn fx:id="name" prefWidth="75.0" text="名前" />
+                  <TableColumn fx:id="personality" prefWidth="75.0" text="性格" />
+                  <TableColumn fx:id="ablity" prefWidth="75.0" text="特性" />
+                  <TableColumn fx:id="item" prefWidth="75.0" text="道具" />
+                  <TableColumn fx:id="totalEffortValue" prefWidth="75.0" text="合計" />
+                  <TableColumn fx:id="hitPointsEffortValue" prefWidth="75.0" text="HP" />
+                  <TableColumn fx:id="attackEffortValue" prefWidth="75.0" text="攻撃" />
+                  <TableColumn fx:id="defenseEffortValue" prefWidth="75.0" text="防御" />
+                  <TableColumn fx:id="specialAttackEffortValue" prefWidth="75.0" text="特攻" />
+                  <TableColumn fx:id="specialDefenseEffortValue" prefWidth="75.0" text="特防" />
+                  <TableColumn fx:id="speedEffortValue" prefWidth="75.0" text="素早さ" />
+              </columns>
+            </TableView>
+            <Button fx:id="addTrainedPokemonBtn" layoutX="586.0" layoutY="425.0" mnemonicParsing="false" onAction="#showAddTrainedPokemon" text="追加" AnchorPane.bottomAnchor="14.0" AnchorPane.rightAnchor="14.0" />
+         </children>
+      </AnchorPane>
+   </children>
+</VBox>
