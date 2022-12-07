@@ -4,6 +4,8 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ResourceBundle;
 
+import common.DataBaseUtil;
+import dao.MAbilityDao;
 import dao.PokemonDetailDao;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
@@ -68,7 +70,17 @@ public class MainController implements Initializable {
 
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
+		setMasterDatas();
 		setTableColumns();
+	}
+
+	/**
+	 * マスタデータを設定する。
+	 */
+	private void setMasterDatas() {
+		// TODO 自動生成されたメソッド・スタブ
+		MAbilityDao mAbilityDao = new MAbilityDao();
+		DataBaseUtil.mAbilityEntityList = mAbilityDao.selectMAbility();
 	}
 
 	@FXML
@@ -81,17 +93,16 @@ public class MainController implements Initializable {
 	@FXML
 	void showAddTrainedPokemon(ActionEvent event) throws IOException {
 
-        FXMLLoader fxmlLoader = new FXMLLoader(
-                getClass().getResource("/application/TrainedPokemonDetail.fxml"));
-        VBox secondPane = (VBox) fxmlLoader.load();
+		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/application/TrainedPokemonDetail.fxml"));
+		VBox secondPane = (VBox) fxmlLoader.load();
 
-        Stage secondStage = new Stage();
+		Stage secondStage = new Stage();
 
-        Scene secondScene = new Scene(secondPane);
-        secondStage.setTitle("PokemonPartyManagementTool");
-        secondStage.setScene(secondScene);
-        secondStage.show();
-        
+		Scene secondScene = new Scene(secondPane);
+		secondStage.setTitle("PokemonPartyManagementTool");
+		secondStage.setScene(secondScene);
+		secondStage.show();
+
 	}
 
 	// カラムとデータクラスメンバの結び付け
@@ -104,12 +115,14 @@ public class MainController implements Initializable {
 		totalEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("totalEffortValue"));
 		hitPointsEffortValue
 				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("hitPointsEffortValue"));
-		attackEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("attackEffortValue"));
-		defenseEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("defenseEffortValue"));
+		attackEffortValue
+				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("attackEffortValue"));
+		defenseEffortValue
+				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("defenseEffortValue"));
 		specialAttackEffortValue
 				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("specialAttackEffortValue"));
-		specialDefenseEffortValue
-				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("specialDefenseEffortValue"));
+		specialDefenseEffortValue.setCellValueFactory(
+				new PropertyValueFactory<PokemonDetailEntity, String>("specialDefenseEffortValue"));
 		speedEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("speedEffortValue"));
 	}
 

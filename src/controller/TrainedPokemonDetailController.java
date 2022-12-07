@@ -2,10 +2,12 @@ package controller;
 
 import java.net.URL;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import java.util.ResourceBundle;
 
+import common.Constants;
+import common.DataBaseUtil;
+import common.TextUtil;
 import dao.MItemDao;
 import dao.MPersonalityDao;
 import dao.MPokemonAbilityDao;
@@ -20,42 +22,21 @@ import model.MItemEntity;
 import model.MPersonalityEntity;
 import model.MPokemonAbilityEntity;
 import model.MPokemonEntity;
+import service.TrainedPokemonDetailService;
 
 public class TrainedPokemonDetailController implements Initializable {
 
-	// ポケモン基本情報リスト
-	private List<MPokemonEntity> globalMPokemonEntityList;
-
-	// ポケモン性格リスト
-	private List<MPersonalityEntity> globalMPersonalityEntityList;
-
-	// ポケモン特性リスト
-	private List<MPokemonAbilityEntity> globalMPokemonAbilityEntityList;
-
-	// アイテムリスト
-	private List<MItemEntity> globalMItemEntityList;
-
-	private final int POKEMON_ID = 0;
-
-	private final int POKEMON_FORM_ID = 1;
-
 	@FXML
 	private ComboBox<String> pokemonNameList;
-
-	@FXML
-	private Button deleteBtn;
-
-	@FXML
-	private Button saveBtn;
-
-	@FXML
-	private ComboBox<String> pokemonAbilityList;
 
 	@FXML
 	private ComboBox<String> pokemonPersonalityList;
 
 	@FXML
 	private ComboBox<String> itemList;
+
+	@FXML
+	private ComboBox<String> pokemonAbilityList;
 
 	@FXML
 	private TextArea hpEffortValueForm;
@@ -75,160 +56,74 @@ public class TrainedPokemonDetailController implements Initializable {
 	@FXML
 	private TextArea speedEffortValueForm;
 
+	@FXML
+	private Button deleteBtn;
+
+	@FXML
+	private Button saveBtn;
+
+	private final TrainedPokemonDetailService trainedPokemonDetailService = new TrainedPokemonDetailService();
+
+	private List<ComboBox<String>> comboBox = new ArrayList<>();
+
+	private List<TextArea> textArea = new ArrayList<>();
+
 	@Override
 	public void initialize(URL location, ResourceBundle resources) {
 		// 一覧データ初期化
-		clearGlobalParams();
-		// ドロップダウンリストに値を設定する
-		setTableDropDownListValues();
-	}
+		trainedPokemonDetailService.clearGlobalParams();
 
-	private void clearGlobalParams() {
-		// ポケモン基本情報リストを初期化
-		globalMPokemonEntityList = new ArrayList<>();
-		// ポケモン性格リストを初期化
-		globalMPersonalityEntityList = new ArrayList<>();
-		// ポケモン特性リストを初期化
-		globalMPokemonAbilityEntityList = new ArrayList<>();
-		// アイテムリストを初期化
-		globalMItemEntityList = new ArrayList<>();
+		// コンボボックス配列にコンボボックスを設定
+		this.addComboBoxList();
+
+		// コンボボックスの初期表示値を設定
+		trainedPokemonDetailService.setTableDropDownListValues(comboBox);
+
+		// テキストエリア配列にテキストエリアを設定
+		this.addTextAreaList();
+
+		// テキストエリアの入力制限を追加
+		trainedPokemonDetailService.setTextAreaRestrictions(textArea);
 	}
 
 	/**
-	 * @param event ポケモンの名前を選択した際、特性のドロップダウンリストを動的に設定する
+	 * @param event ポケモンの名前コンボボックスの値が変更された際の処理
 	 */
 	@FXML
-	void changePokemonName(ActionEvent event) {
-		// リストの内容を初期化
-		pokemonAbilityList.getItems().clear();
-
-		// 選択された名前からIDを取得
-		List<String> ids = getPokemonIds(pokemonNameList.getValue());
-
-		// ポケモンの名前に紐づく性格をドロップダウンリストに設定する
-		setPokemonAbilityList(ids.get(POKEMON_ID), ids.get(POKEMON_FORM_ID));
+	private void changePokemonName(ActionEvent event) {
+		// 特性コンボボックスの値を動的に生成
+		trainedPokemonDetailService.setPokemonAbilityList(comboBox);
 	}
 
-	private List<String> getPokemonIds(String value) {
-		// 返却用リスト生成
-		List<String> ids = new ArrayList<>();
-		for (MPokemonEntity mPokemonEntity : globalMPokemonEntityList) {
-			if (value.equals(mPokemonEntity.getName())) {
-				// リストにポケモンIDをセット
-				ids.add(POKEMON_ID, mPokemonEntity.getId());
-				// リストにポケモンすがたIDをセット
-				ids.add(POKEMON_FORM_ID, mPokemonEntity.getFormId());
-				// ループを終了
-				break;
-			}
-		}
-
-		// IDのリストを返却
-		return ids;
+	/**
+	 * @param event 「save」発火時の処理
+	 */
+	@FXML
+	private void save(ActionEvent event) {
+		trainedPokemonDetailService.save(comboBox, textArea);
 	}
 
-	private void setTableDropDownListValues() {
-		// ポケモンの名前一覧をドロップダウンリストに設定する
-		setPokemonNameList();
+	/**
+	 * @param event 「delete」発火時の処理
+	 */
+	@FXML
+	private void delete(ActionEvent event) {
 
-		// ポケモンの性格一覧をドロップダウンリストに設定する
-		setPokemonPersonalityList();
-
-		// どうぐ一覧をドロップダウンリストに設定する
-		setItemList();
 	}
 
-	private void setPokemonNameList() {
-
-		// 初期化
-		globalMPokemonEntityList = new ArrayList<>();
-
-		// ポケモン基本情報一覧をマスタテーブルから取得する
-		MPokemonDao dao = new MPokemonDao();
-		List<MPokemonEntity> mPokemonEntityList = dao.selectMPokemon();
-
-		// ポケモンの名前一覧をドロップダウンリストに設定する
-		for (MPokemonEntity mPokemonEntity : mPokemonEntityList) {
-			// 表示名初期化
-			String pokemonName = null;
-
-			if (mPokemonEntity.getFormRemarks() != null && !mPokemonEntity.getFormRemarks().isEmpty()) {
-				// 特殊なすがたがある場合のみ連結
-				pokemonName = mPokemonEntity.getName() + mPokemonEntity.getFormRemarks();
-			} else {
-				// そうでない場合、名前のみ
-				pokemonName = mPokemonEntity.getName();
-			}
-			// Entityの中身を操作（よくない）
-			mPokemonEntity.setName(pokemonName);
-			// リストに値を設定
-			pokemonNameList.getItems().add(pokemonName);
-		}
-
-		// 画面のデータリストに格納
-		globalMPokemonEntityList = mPokemonEntityList;
+	private void addComboBoxList() {
+		this.comboBox.add(Constants.COMBO_BOX_POKEMON_NAME_LIST, pokemonNameList);
+		this.comboBox.add(Constants.COMBO_BOX_POKEMON_PERSONALITY_LIST, pokemonPersonalityList);
+		this.comboBox.add(Constants.COMBO_BOX_ITEM_LIST, itemList);
+		this.comboBox.add(Constants.COMBO_BOX_POKEMON_ABILITY_LIST, pokemonAbilityList);
 	}
 
-	private void setPokemonPersonalityList() {
-
-		// 初期化
-		globalMPersonalityEntityList = new ArrayList<>();
-
-		// ポケモン性格一覧をマスタテーブルから取得する
-		MPersonalityDao dao = new MPersonalityDao();
-		List<MPersonalityEntity> mPersonalityEntityList = dao.selectMPersonality();
-
-		// ポケモンの性格一覧をドロップダウンリストに設定する
-		for (MPersonalityEntity mPersonalityEntity : mPersonalityEntityList) {
-			pokemonPersonalityList.getItems().add(mPersonalityEntity.getName());
-		}
-
-		// 画面のデータリストに格納
-		globalMPersonalityEntityList = mPersonalityEntityList;
-	}
-
-	private void setItemList() {
-
-		// 初期化
-		globalMItemEntityList = new ArrayList<>();
-
-		// ポケモン基本情報一覧をマスタテーブルから取得する
-		MItemDao dao = new MItemDao();
-		List<MItemEntity> mItemEntityList = dao.selectMItem();
-
-		// ポケモンの名前一覧をドロップダウンリストに設定する
-		for (MItemEntity mItemEntity : mItemEntityList) {
-			itemList.getItems().add(mItemEntity.getName());
-		}
-
-		// 画面のデータリストに格納
-		globalMItemEntityList = mItemEntityList;
-	}
-
-	private void setPokemonAbilityList(String id, String formId) {
-//		// ドロップダウンリストの初期化
-//		pokemonAbilityList = new ComboBox<String>();
-
-		// ポケモン特性情報マスタテーブルから取得する
-		MPokemonAbilityDao dao = new MPokemonAbilityDao();
-		MPokemonAbilityEntity mPokemonAbilityEntity = dao.selectMPokemonAbility(id, formId);
-
-		List<String> dispPokemonAbilityList = new ArrayList<>();
-		if (mPokemonAbilityEntity.getAbility1() != null && !"NULL".equals(mPokemonAbilityEntity.getAbility1())) {
-			dispPokemonAbilityList.add(mPokemonAbilityEntity.getAbility1());
-		}
-		if (mPokemonAbilityEntity.getAbility2() != null && !"NULL".equals(mPokemonAbilityEntity.getAbility2())) {
-			dispPokemonAbilityList.add(mPokemonAbilityEntity.getAbility2());
-		}
-		if (mPokemonAbilityEntity.getDreamAbility() != null
-				&& !"NULL".equals(mPokemonAbilityEntity.getDreamAbility())) {
-			dispPokemonAbilityList.add("(夢)" + mPokemonAbilityEntity.getDreamAbility());
-		}
-		// 画面のデータリストに格納
-
-		// ポケモンの名前に紐づく特性をドロップダウンリストに設定する
-		for (String abilityName : dispPokemonAbilityList) {
-			pokemonAbilityList.getItems().add(abilityName);
-		}
+	private void addTextAreaList() {
+		this.textArea.add(Constants.TEXT_AREA_HP_EFFORT_VALUE, hpEffortValueForm);
+		this.textArea.add(Constants.TEXT_AREA_ATTACK_EFFORT_VALUE, attackEffortValueForm);
+		this.textArea.add(Constants.TEXT_AREA_DEFENSE_EFFORT_VALUE, defenseEffortValueForm);
+		this.textArea.add(Constants.TEXT_AREA_SPECIAL_ATTACK_EFFORT_VALUE, specialAttackEffortValueForm);
+		this.textArea.add(Constants.TEXT_AREA_SPECIAL_DEFENSE_EFFORT_VALUE, specialDefenseEffortValueForm);
+		this.textArea.add(Constants.TEXT_AREA_SPEED_EFFORT_VALUE, speedEffortValueForm);
 	}
 }

@@ -13,7 +13,7 @@ import model.MPokemonAbilityEntity;
 
 public class MPokemonAbilityDao {
 
-	private final String selectMPokemonAbility = "SELECT * FROM M_POKEMON_ABILITY WHERE POKEMON_ID = ? AND POKEMON_FORM_ID = ?";
+	private final String selectMPokemonAbilityByIds = "SELECT * FROM M_POKEMON_ABILITY WHERE POKEMON_ID = ? AND POKEMON_FORM_ID = ?";
 
 	private final int POKEMON_ID = 1;
 
@@ -26,7 +26,7 @@ public class MPokemonAbilityDao {
 	 * @param pokemonFormId
 	 * @return
 	 */
-	public MPokemonAbilityEntity selectMPokemonAbility(String pokemonId, String pokemonFormId) {
+	public MPokemonAbilityEntity selectMPokemonAbilityByIds(String pokemonId, String pokemonFormId) {
 
 		// 1レコードずつ値をモデルクラスに設定
 		MPokemonAbilityEntity mPokemonAbilityEntity = new MPokemonAbilityEntity();
@@ -37,7 +37,7 @@ public class MPokemonAbilityDao {
 			Connection con = DriverManager.getConnection("jdbc:sqlite:lib/localDB/localDB.db");
 
 			// select文のセッティング
-			PreparedStatement pstmt = con.prepareStatement(selectMPokemonAbility);
+			PreparedStatement pstmt = con.prepareStatement(selectMPokemonAbilityByIds);
 
 			// ワイルドカードに値を設定
 			pstmt.setString(POKEMON_ID, pokemonId);
