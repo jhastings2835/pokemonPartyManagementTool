@@ -19,6 +19,7 @@ import javafx.fxml.Initializable;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import model.MItemEntity;
 import model.MPersonalityEntity;
 import model.MPokemonAbilityEntity;
@@ -58,6 +59,18 @@ public class TrainedPokemonDetailController implements Initializable {
     private TextArea speedEffortValueForm;
 
     @FXML
+    private TextField move1Form;
+
+    @FXML
+    private TextField move2Form;
+
+    @FXML
+    private TextField move3Form;
+
+    @FXML
+    private TextField move4Form;
+
+    @FXML
     private Button deleteBtn;
 
     @FXML
@@ -68,6 +81,8 @@ public class TrainedPokemonDetailController implements Initializable {
     private List<ComboBox<String>> comboBox = new ArrayList<>();
 
     private List<TextArea> textArea = new ArrayList<>();
+
+    private List<TextField> textField = new ArrayList<>();
 
     @Override
     public void initialize(URL location, ResourceBundle resources) {
@@ -82,6 +97,9 @@ public class TrainedPokemonDetailController implements Initializable {
 
         // テキストエリア配列にテキストエリアを設定
         this.addTextAreaList();
+
+        // テキストエリア配列にテキストエリアを設定
+        this.addTextFiledList();
 
         // テキストエリアの入力制限を追加
         trainedPokemonDetailService.setTextAreaRestrictions(textArea);
@@ -102,7 +120,11 @@ public class TrainedPokemonDetailController implements Initializable {
      */
     @FXML
     private void save(ActionEvent event) throws IOException {
-        trainedPokemonDetailService.save(comboBox, textArea);
+
+        trainedPokemonDetailService.save(comboBox, textArea, textField);
+
+        // 画面を閉じる
+        saveBtn.getScene().getWindow().hide();
     }
 
     /**
@@ -136,5 +158,12 @@ public class TrainedPokemonDetailController implements Initializable {
                 specialDefenseEffortValueForm);
         this.textArea.add(Constants.TEXT_AREA_SPEED_EFFORT_VALUE,
                 speedEffortValueForm);
+    }
+
+    private void addTextFiledList() {
+        this.textField.add(Constants.TEXT_FIELD_MOVE_1, move1Form);
+        this.textField.add(Constants.TEXT_FIELD_MOVE_2, move2Form);
+        this.textField.add(Constants.TEXT_FIELD_MOVE_3, move3Form);
+        this.textField.add(Constants.TEXT_FIELD_MOVE_4, move4Form);
     }
 }

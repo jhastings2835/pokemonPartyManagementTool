@@ -1,7 +1,4 @@
-/application/
 /common/
-/controller/
-/dao/
-/model/
-/module-info.class
 /service/
+/dao/
+/controller/

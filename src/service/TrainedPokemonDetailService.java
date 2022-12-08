@@ -12,12 +12,17 @@ import dao.MItemDao;
 import dao.MPersonalityDao;
 import dao.MPokemonAbilityDao;
 import dao.MPokemonDao;
+import dao.TTrainedPokemonDao;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
 import javafx.scene.control.ComboBox;
+import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
+import javafx.scene.control.TextField;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import javafx.stage.StageStyle;
+import javafx.stage.WindowEvent;
 import model.MAbilityEntity;
 import model.MItemEntity;
 import model.MPersonalityEntity;
@@ -53,6 +58,9 @@ public class TrainedPokemonDetailService {
     // アイテム一覧情報dao
     MItemDao mItemDao = new MItemDao();
 
+    // 育成済みポケモンdao
+    TTrainedPokemonDao tTrainedPokemonDao = new TTrainedPokemonDao();
+
     /**
      * 画面で保持する変数を初期化
      */
@@ -86,14 +94,29 @@ public class TrainedPokemonDetailService {
     /**
      * 画面項目値保存
      * 
+     * @param ownStage
+     * 
      * @param comboBox
      * @param textArea
+     * @param textField
      * @throws IOException
      */
-    public void save(List<ComboBox<String>> comboBox, List<TextArea> textArea)
-            throws IOException {
+    public void save(List<ComboBox<String>> comboBox, List<TextArea> textArea,
+            List<TextField> textField) throws IOException {
         // 登録前のチェック
         if (validation(comboBox)) {
+            // エラーが存在した場合、アラートダイアログ送出し、処理を行わない
+            FXMLLoader fxmlLoader = new FXMLLoader(
+                    getClass().getResource("/application/ValidateAlert.fxml"));
+            VBox validateAlertPane = (VBox) fxmlLoader.load();
+
+            Stage validateAlertStage = new Stage();
+
+            Scene validateAlertScene = new Scene(validateAlertPane);
+            validateAlertStage.setTitle("PokemonPartyManagementTool");
+            validateAlertStage.setScene(validateAlertScene);
+            validateAlertStage.show();
+
             return;
         }
         // 名前から変換したIDを保存するデータ型を準備
@@ -103,11 +126,147 @@ public class TrainedPokemonDetailService {
         getIdByName(comboBox, idsByName);
 
         // ローカルDBに取得した値を設定
-        System.out.println(idsByName);
+        regist(idsByName, textArea, textField);
+    }
+
+    private void regist(List<List<String>> idsByName, List<TextArea> textArea,
+            List<TextField> textField) {
+        List<String> insertParams = new ArrayList<>();
+        // POKEMON_ID
+        insertParams.add(Constants.INSERT_PARAM_POKEMON_ID,
+                idsByName.get(Constants.COMBO_BOX_POKEMON_NAME_LIST)
+                        .get(Constants.POKEMON_ID));
+        // POKEMON_FORM_ID
+        insertParams.add(Constants.INSERT_PARAM_POKEMON_FORM_ID,
+                idsByName.get(Constants.COMBO_BOX_POKEMON_NAME_LIST)
+                        .get(Constants.POKEMON_FORM_ID));
+        // PERSONALITY_ID
+        insertParams.add(Constants.INSERT_PARAM_PERSONALITY_ID,
+                idsByName.get(Constants.COMBO_BOX_POKEMON_PERSONALITY_LIST)
+                        .get(Constants.PERSONALITY_ID));
+        // ITEM_ID
+        insertParams.add(Constants.INSERT_PARAM_ITEM_ID, idsByName
+                .get(Constants.COMBO_BOX_ITEM_LIST).get(Constants.ITEM_ID));
+
+        // ABILITY_ID
+        insertParams.add(Constants.INSERT_PARAM_ABILITY_ID,
+                idsByName.get(Constants.COMBO_BOX_POKEMON_ABILITY_LIST)
+                        .get(Constants.ABILITY_ID));
+
+        // HIT_POINTS_EFFORT_VALUE
+        String hitPointsEffortValue = textArea
+                .get(Constants.TEXT_AREA_HP_EFFORT_VALUE).getText();
+        // 登録値がnullの場合、「0」に変換
+        if (hitPointsEffortValue == null || hitPointsEffortValue.isEmpty()) {
+            hitPointsEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_HIT_POINTS_EFFORT_VALUE,
+                hitPointsEffortValue);
+
+        // ATTACK_EFFORT_VALUE
+        String attackEffortValue = textArea
+                .get(Constants.TEXT_AREA_ATTACK_EFFORT_VALUE).getText();
+        // 登録値がnullの場合、「0」に変換
+        if (attackEffortValue == null || attackEffortValue.isEmpty()) {
+            attackEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_ATTACK_EFFORT_VALUE,
+                attackEffortValue);
+
+        // DEFENSE_EFFORT_VALUE
+        String defenseEffortValue = textArea
+                .get(Constants.TEXT_AREA_DEFENSE_EFFORT_VALUE).getText();
+        // 登録値がnullの場合、「0」に変換
+        if (defenseEffortValue == null || defenseEffortValue.isEmpty()) {
+            defenseEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_DEFENSE_EFFORT_VALUE,
+                defenseEffortValue);
+
+        // SPECIAL_ATTACK_EFFORT_VALUE
+        String specialAttackEffortValue = textArea
+                .get(Constants.TEXT_AREA_SPECIAL_ATTACK_EFFORT_VALUE).getText();
+        // 登録値がnullの場合、「0」に変換
+        if (specialAttackEffortValue == null
+                || specialAttackEffortValue.isEmpty()) {
+            specialAttackEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_SPECIAL_ATTACK_EFFORT_VALUE,
+                specialAttackEffortValue);
+
+        // SPECIAL_DEFENSE_EFFORT_VALUE
+        String specialDefenseEffortValue = textArea
+                .get(Constants.TEXT_AREA_SPECIAL_DEFENSE_EFFORT_VALUE)
+                .getText();
+        // 登録値がnullの場合、「0」に変換
+        if (specialDefenseEffortValue == null
+                || specialDefenseEffortValue.isEmpty()) {
+            specialDefenseEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_SPECIAL_DEFENSE_EFFORT_VALUE,
+                specialDefenseEffortValue);
+
+        // SPEED_EFFORT_VALUE
+        String speedEffortValue = textArea
+                .get(Constants.TEXT_AREA_SPEED_EFFORT_VALUE).getText();
+        // 登録値がnullの場合、「0」に変換
+        if (speedEffortValue == null || speedEffortValue.isEmpty()) {
+            speedEffortValue = Constants.EFFORT_ZERO;
+        }
+        insertParams.add(Constants.INSERT_PARAM_SPEED_EFFORT_VALUE,
+                speedEffortValue);
+
+        // TOTAL_EFFORT_VALUE
+        // 努力値合計を計算
+        Integer intTotalEffortValue = Integer.parseInt(hitPointsEffortValue)
+                + Integer.parseInt(attackEffortValue)
+                + Integer.parseInt(defenseEffortValue)
+                + Integer.parseInt(specialAttackEffortValue)
+                + Integer.parseInt(specialDefenseEffortValue)
+                + Integer.parseInt(speedEffortValue);
+        // Stringに変換
+        String StringTotalEffortValue = intTotalEffortValue.toString();
+        insertParams.add(Constants.INSERT_PARAM_TOTAL_EFFORT_VALUE,
+                StringTotalEffortValue);
+
+        // MOVE_ID_1
+        String moveId1 = textField.get(Constants.TEXT_FIELD_MOVE_1).getText();
+        // 登録値がnullの場合、空文字に変換
+        if (moveId1 == null || moveId1.isEmpty()) {
+            moveId1 = Constants.EMPTY;
+        }
+        insertParams.add(Constants.INSERT_PARAM_MOVE_ID_1, moveId1);
+
+        // MOVE_ID_2
+        String moveId2 = textField.get(Constants.TEXT_FIELD_MOVE_2).getText();
+        // 登録値がnullの場合、空文字に変換
+        if (moveId2 == null || moveId2.isEmpty()) {
+            moveId2 = Constants.EMPTY;
+        }
+        insertParams.add(Constants.INSERT_PARAM_MOVE_ID_2, moveId2);
+
+        // MOVE_ID_3
+        String moveId3 = textField.get(Constants.TEXT_FIELD_MOVE_3).getText();
+        // 登録値がnullの場合、空文字に変換
+        if (moveId3 == null || moveId3.isEmpty()) {
+            moveId3 = Constants.EMPTY;
+        }
+        insertParams.add(Constants.INSERT_PARAM_MOVE_ID_3, moveId3);
+
+        // MOVE_ID_4
+        String moveId4 = textField.get(Constants.TEXT_FIELD_MOVE_4).getText();
+        // 登録値がnullの場合、空文字に変換
+        if (moveId4 == null || moveId4.isEmpty()) {
+            moveId4 = Constants.EMPTY;
+        }
+        insertParams.add(Constants.INSERT_PARAM_MOVE_ID_4, moveId4);
+
+        tTrainedPokemonDao.insertTTrainedPokemon(insertParams);
     }
 
     /**
      * 保存時の登録値チェック
+     * 
      * 
      * @param comboBox
      * @throws IOException
@@ -124,18 +283,6 @@ public class TrainedPokemonDetailService {
                         .getValue() == null
                 || comboBox.get(Constants.COMBO_BOX_POKEMON_ABILITY_LIST)
                         .getValue() == null) {
-
-            // アラートダイアログ送出
-            FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/application/ValidateAlert.fxml"));
-            VBox validateAlertPane = (VBox) fxmlLoader.load();
-
-            Stage validateAlertStage = new Stage();
-
-            Scene validateAlertScene = new Scene(validateAlertPane);
-            validateAlertStage.setTitle("PokemonPartyManagementTool");
-            validateAlertStage.setScene(validateAlertScene);
-            validateAlertStage.show();
             return true;
         }
         return false;
