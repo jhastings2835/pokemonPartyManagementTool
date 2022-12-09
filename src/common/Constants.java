@@ -55,9 +55,9 @@ public class Constants {
 
     public static final int INSERT_PARAM_PERSONALITY_ID = 2;
 
-    public static final int INSERT_PARAM_ITEM_ID = 3;
+    public static final int INSERT_PARAM_ABILITY_ID = 3;
 
-    public static final int INSERT_PARAM_ABILITY_ID = 4;
+    public static final int INSERT_PARAM_ITEM_ID = 4;
 
     public static final int INSERT_PARAM_HIT_POINTS_EFFORT_VALUE = 5;
 

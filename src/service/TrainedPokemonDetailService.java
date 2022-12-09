@@ -144,14 +144,14 @@ public class TrainedPokemonDetailService {
         insertParams.add(Constants.INSERT_PARAM_PERSONALITY_ID,
                 idsByName.get(Constants.COMBO_BOX_POKEMON_PERSONALITY_LIST)
                         .get(Constants.PERSONALITY_ID));
-        // ITEM_ID
-        insertParams.add(Constants.INSERT_PARAM_ITEM_ID, idsByName
-                .get(Constants.COMBO_BOX_ITEM_LIST).get(Constants.ITEM_ID));
 
         // ABILITY_ID
         insertParams.add(Constants.INSERT_PARAM_ABILITY_ID,
                 idsByName.get(Constants.COMBO_BOX_POKEMON_ABILITY_LIST)
                         .get(Constants.ABILITY_ID));
+        // ITEM_ID
+        insertParams.add(Constants.INSERT_PARAM_ITEM_ID, idsByName
+                .get(Constants.COMBO_BOX_ITEM_LIST).get(Constants.ITEM_ID));
 
         // HIT_POINTS_EFFORT_VALUE
         String hitPointsEffortValue = textArea

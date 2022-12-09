@@ -2,128 +2,160 @@ package controller;
 
 import java.io.IOException;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.ResourceBundle;
+import java.util.concurrent.ArrayBlockingQueue;
 
 import common.DataBaseUtil;
 import dao.MAbilityDao;
-import dao.PokemonDetailDao;
+import dao.TTrainedPokemonDao;
+import dto.PokemonDetailDto;
 import javafx.event.ActionEvent;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
-import javafx.scene.layout.BorderPane;
-import javafx.scene.layout.StackPane;
 import javafx.scene.layout.VBox;
-import javafx.stage.Screen;
 import javafx.stage.Stage;
-import model.PokemonDetailEntity;
+import service.MainService;
 
 public class MainController implements Initializable {
 
-	@FXML
-	private Button addTrainedPokemonBtn;
+    @FXML
+    private Button addTrainedPokemonBtn;
 
-	@FXML
-	private TableView<PokemonDetailEntity> tableResultList;
+    @FXML
+    private TableView<PokemonDetailDto> tableResultList;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> id;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> name;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> name;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> personality;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> personality;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> ability;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> ablity;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> item;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> item;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> hitPointsEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> totalEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> attackEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> hitPointsEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> defenseEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> attackEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> specialAttackEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> defenseEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> specialDefenseEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> specialAttackEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> speedEffortValue;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> specialDefenseEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> move1;
 
-	@FXML
-	private TableColumn<PokemonDetailEntity, String> speedEffortValue;
+    @FXML
+    private TableColumn<PokemonDetailDto, String> move2;
 
-	@Override
-	public void initialize(URL location, ResourceBundle resources) {
-		setMasterDatas();
-		setTableColumns();
-	}
+    @FXML
+    private TableColumn<PokemonDetailDto, String> move3;
 
-	/**
-	 * マスタデータを設定する。
-	 */
-	private void setMasterDatas() {
-		// TODO 自動生成されたメソッド・スタブ
-		MAbilityDao mAbilityDao = new MAbilityDao();
-		DataBaseUtil.mAbilityEntityList = mAbilityDao.selectMAbility();
-	}
+    @FXML
+    private TableColumn<PokemonDetailDto, String> move4;
 
-	@FXML
-	void actLoad(ActionEvent event) {
-		PokemonDetailDao dao = new PokemonDetailDao();
-		tableResultList.getItems().clear();
-		tableResultList.getItems().addAll(dao.selectTTrainedPokemon());
-	}
+    private final MainService mainService = new MainService();
 
-	@FXML
-	void showAddTrainedPokemon(ActionEvent event) throws IOException {
+    @Override
+    public void initialize(URL location, ResourceBundle resources) {
+        setMasterDatas();
+        setTableColumns();
+    }
 
-		FXMLLoader fxmlLoader = new FXMLLoader(getClass().getResource("/application/TrainedPokemonDetail.fxml"));
-		VBox secondPane = (VBox) fxmlLoader.load();
+    /**
+     * マスタデータを設定する。
+     */
+    private void setMasterDatas() {
+        // TODO 自動生成されたメソッド・スタブ
+        MAbilityDao mAbilityDao = new MAbilityDao();
+        DataBaseUtil.mAbilityEntityList = mAbilityDao.selectMAbility();
+    }
 
-		Stage secondStage = new Stage();
+    @FXML
+    void actLoad(ActionEvent event) {
+        List<PokemonDetailDto> pokemonDetailDtoList = new ArrayList<>();
+        pokemonDetailDtoList = mainService.getPokemonDetailDto();
+        tableResultList.getItems().clear();
+        tableResultList.getItems().addAll(pokemonDetailDtoList);
+    }
 
-		Scene secondScene = new Scene(secondPane);
-		secondStage.setTitle("PokemonPartyManagementTool");
-		secondStage.setScene(secondScene);
-		secondStage.show();
+    @FXML
+    void showAddTrainedPokemon(ActionEvent event) throws IOException {
 
-	}
+        FXMLLoader fxmlLoader = new FXMLLoader(getClass()
+                .getResource("/application/TrainedPokemonDetail.fxml"));
+        VBox secondPane = (VBox) fxmlLoader.load();
 
-	// カラムとデータクラスメンバの結び付け
-	private void setTableColumns() {
-		id.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("id"));
-		name.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("name"));
-		personality.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("personality"));
-		ablity.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("ablity"));
-		item.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("item"));
-		totalEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("totalEffortValue"));
-		hitPointsEffortValue
-				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("hitPointsEffortValue"));
-		attackEffortValue
-				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("attackEffortValue"));
-		defenseEffortValue
-				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("defenseEffortValue"));
-		specialAttackEffortValue
-				.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("specialAttackEffortValue"));
-		specialDefenseEffortValue.setCellValueFactory(
-				new PropertyValueFactory<PokemonDetailEntity, String>("specialDefenseEffortValue"));
-		speedEffortValue.setCellValueFactory(new PropertyValueFactory<PokemonDetailEntity, String>("speedEffortValue"));
-	}
+        Stage secondStage = new Stage();
 
+        Scene secondScene = new Scene(secondPane);
+        secondStage.setTitle("PokemonPartyManagementTool");
+        secondStage.setScene(secondScene);
+        secondStage.show();
+
+    }
+
+    // カラムとデータクラスメンバの結び付け
+    private void setTableColumns() {
+        name.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>("name"));
+        personality.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "personalityName"));
+        ability.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "abilityName"));
+        item.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>("itemName"));
+        hitPointsEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "hitPointsEffortValue"));
+        attackEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "attackEffortValue"));
+        defenseEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "defenseEffortValue"));
+        specialAttackEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "specialAttackEffortValue"));
+        specialDefenseEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "specialDefenseEffortValue"));
+        speedEffortValue.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "speedEffortValue"));
+        move1.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "move1Name"));
+        move2.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "move2Name"));
+        move3.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "move3Name"));
+        move4.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>(
+                        "move4Name"));
+    }
 }
