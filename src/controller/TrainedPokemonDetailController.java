@@ -41,6 +41,9 @@ public class TrainedPokemonDetailController implements Initializable {
     private ComboBox<String> pokemonAbilityList;
 
     @FXML
+    private ComboBox<String> teraTypeList;
+
+    @FXML
     private TextArea hpEffortValueForm;
 
     @FXML
@@ -121,10 +124,13 @@ public class TrainedPokemonDetailController implements Initializable {
     @FXML
     private void save(ActionEvent event) throws IOException {
 
-        trainedPokemonDetailService.save(comboBox, textArea, textField);
+        Boolean saveComplete = trainedPokemonDetailService.save(comboBox,
+                textArea, textField);
 
-        // 画面を閉じる
-        saveBtn.getScene().getWindow().hide();
+        if (saveComplete) {
+            // 保存処理が正常終了した場合、画面を閉じる
+            saveBtn.getScene().getWindow().hide();
+        }
     }
 
     /**
@@ -143,6 +149,7 @@ public class TrainedPokemonDetailController implements Initializable {
         this.comboBox.add(Constants.COMBO_BOX_ITEM_LIST, itemList);
         this.comboBox.add(Constants.COMBO_BOX_POKEMON_ABILITY_LIST,
                 pokemonAbilityList);
+        this.comboBox.add(Constants.COMBO_BOX_TERA_TYPE_LIST, teraTypeList);
     }
 
     private void addTextAreaList() {

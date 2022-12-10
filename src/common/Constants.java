@@ -11,6 +11,8 @@ public class Constants {
 
     public static final int COMBO_BOX_POKEMON_ABILITY_LIST = 3;
 
+    public static final int COMBO_BOX_TERA_TYPE_LIST = 4;
+
     // テキストエリア配列の添字
     public static final int TEXT_AREA_HP_EFFORT_VALUE = 0;
 
@@ -80,6 +82,8 @@ public class Constants {
     public static final int INSERT_PARAM_MOVE_ID_3 = 14;
 
     public static final int INSERT_PARAM_MOVE_ID_4 = 15;
+
+    public static final int INSERT_PARAM_TERA_TYPE = 16;
 
     // null値に変えて登録を行うための定数
     public static final String EFFORT_ZERO = "0";

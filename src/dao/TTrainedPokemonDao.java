@@ -14,11 +14,11 @@ import model.TTrainedPokemonEntity;
 
 public class TTrainedPokemonDao {
 
-    private final String insertTTrainedPokemon = "INSERT INTO T_TRAINED_POKEMON (POKEMON_ID,POKEMON_FORM_ID,PERSONALITY_ID,ABILITY_ID,ITEM_ID,HIT_POINTS_EFFORT_VALUE,ATTACK_EFFORT_VALUE,DEFENSE_EFFORT_VALUE,SPECIAL_ATTACK_EFFORT_VALUE,SPECIAL_DEFENSE_EFFORT_VALUE,SPEED_EFFORT_VALUE,TOTAL_EFFORT_VALUE,MOVE_ID_1,MOVE_ID_2,MOVE_ID_3,MOVE_ID_4) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
+    private final String insertTTrainedPokemon = "INSERT INTO T_TRAINED_POKEMON (POKEMON_ID,POKEMON_FORM_ID,PERSONALITY_ID,ABILITY_ID,ITEM_ID,HIT_POINTS_EFFORT_VALUE,ATTACK_EFFORT_VALUE,DEFENSE_EFFORT_VALUE,SPECIAL_ATTACK_EFFORT_VALUE,SPECIAL_DEFENSE_EFFORT_VALUE,SPEED_EFFORT_VALUE,TOTAL_EFFORT_VALUE,MOVE_ID_1,MOVE_ID_2,MOVE_ID_3,MOVE_ID_4,TERA_TYPE) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)";
 
     private final String selectTrainedPokemon = "SELECT * FROM T_TRAINED_POKEMON";
 
-    private final String selectDisplayPokemonDetail = "select mpokemon.NAME name, personality.NAME personality, ability.NAME ability, item.NAME item, trained.HIT_POINTS_EFFORT_VALUE hitPointsEffortValue, trained.ATTACK_EFFORT_VALUE attackEffortValue, trained.DEFENSE_EFFORT_VALUE defenseEffortValue, trained.SPECIAL_ATTACK_EFFORT_VALUE specialAttackEffortValue, trained.SPECIAL_DEFENSE_EFFORT_VALUE specialDefenseEffortValue, trained.SPEED_EFFORT_VALUE speedEffortValue, trained.MOVE_ID_1 move1Name, trained.MOVE_ID_2 move2Name, trained.MOVE_ID_3 move3Name, trained.MOVE_ID_4 move4Name from T_TRAINED_POKEMON trained INNER JOIN M_POKEMON mpokemon on trained.POKEMON_ID = mpokemon.ID and trained.POKEMON_FORM_ID = mpokemon.FORM_ID INNER JOIN M_PERSONALITY personality ON trained.PERSONALITY_ID = personality.ID INNER JOIN M_ABILITY ability ON trained.ABILITY_ID = ability.ID INNER JOIN M_ITEM item ON trained.ITEM_ID = item.ID";
+    private final String selectDisplayPokemonDetail = "select mpokemon.NAME name, personality.NAME personality, ability.NAME ability, item.NAME item, type.NAME teraType, trained.HIT_POINTS_EFFORT_VALUE hitPointsEffortValue, trained.ATTACK_EFFORT_VALUE attackEffortValue, trained.DEFENSE_EFFORT_VALUE defenseEffortValue, trained.SPECIAL_ATTACK_EFFORT_VALUE specialAttackEffortValue, trained.SPECIAL_DEFENSE_EFFORT_VALUE specialDefenseEffortValue, trained.SPEED_EFFORT_VALUE speedEffortValue, trained.MOVE_ID_1 move1Name, trained.MOVE_ID_2 move2Name, trained.MOVE_ID_3 move3Name, trained.MOVE_ID_4 move4Name from T_TRAINED_POKEMON trained INNER JOIN M_POKEMON mpokemon on trained.POKEMON_ID = mpokemon.ID and trained.POKEMON_FORM_ID = mpokemon.FORM_ID INNER JOIN M_PERSONALITY personality ON trained.PERSONALITY_ID = personality.ID INNER JOIN M_ABILITY ability ON trained.ABILITY_ID = ability.ID INNER JOIN M_ITEM item ON trained.ITEM_ID = item.ID INNER JOIN M_BASIC_TYPE type ON trained.TERA_TYPE = type.ID";
 
     public void insertTTrainedPokemon(List<String> insertParams) {
         try {
@@ -70,9 +70,11 @@ public class TTrainedPokemonDao {
             pstmt.setString(Constants.INSERT_PARAM_MOVE_ID_2 + 1,
                     insertParams.get(Constants.INSERT_PARAM_MOVE_ID_2));
             pstmt.setString(Constants.INSERT_PARAM_MOVE_ID_3 + 1,
-                    insertParams.get(Constants.INSERT_PARAM_MOVE_ID_2));
+                    insertParams.get(Constants.INSERT_PARAM_MOVE_ID_3));
             pstmt.setString(Constants.INSERT_PARAM_MOVE_ID_4 + 1,
                     insertParams.get(Constants.INSERT_PARAM_MOVE_ID_4));
+            pstmt.setString(Constants.INSERT_PARAM_TERA_TYPE + 1,
+                    insertParams.get(Constants.INSERT_PARAM_TERA_TYPE));
 
             // クエリを実行
             pstmt.executeUpdate();
@@ -166,6 +168,7 @@ public class TTrainedPokemonDao {
                 pokemonDetailDto.setMove2Name(rs.getString("move2Name"));
                 pokemonDetailDto.setMove3Name(rs.getString("move3Name"));
                 pokemonDetailDto.setMove4Name(rs.getString("move4Name"));
+                pokemonDetailDto.setTeraType(rs.getString("teraType"));
                 pokemonDetailDtoList.add(pokemonDetailDto);
             }
             stmt.close();

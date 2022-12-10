@@ -30,6 +30,8 @@ public class PokemonDetailDto {
 
     private String move4Name;
 
+    private String teraType;
+
     public String getName() {
         return name;
     }
@@ -140,6 +142,14 @@ public class PokemonDetailDto {
 
     public void setMove4Name(String move4Name) {
         this.move4Name = move4Name;
+    }
+
+    public String getTeraType() {
+        return teraType;
+    }
+
+    public void setTeraType(String teraType) {
+        this.teraType = teraType;
     }
 
 }

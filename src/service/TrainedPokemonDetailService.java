@@ -3,6 +3,7 @@ package service;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import common.Constants;
 import common.DataBaseUtil;
@@ -12,9 +13,13 @@ import dao.MItemDao;
 import dao.MPersonalityDao;
 import dao.MPokemonAbilityDao;
 import dao.MPokemonDao;
+import dao.MBasicTypeDao;
 import dao.TTrainedPokemonDao;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
+import javafx.scene.control.ButtonType;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.MenuItem;
 import javafx.scene.control.TextArea;
@@ -24,6 +29,7 @@ import javafx.stage.Stage;
 import javafx.stage.StageStyle;
 import javafx.stage.WindowEvent;
 import model.MAbilityEntity;
+import model.MBasicTypeEntity;
 import model.MItemEntity;
 import model.MPersonalityEntity;
 import model.MPokemonAbilityEntity;
@@ -43,6 +49,9 @@ public class TrainedPokemonDetailService {
     // アイテムリスト
     private List<MItemEntity> globalMItemEntityList;
 
+    // テラスタイプリスト
+    private List<MBasicTypeEntity> globalMBasicTypeEntityList;
+
     // ポケモン基本情報一覧dao
     MPokemonDao mPokemonDao = new MPokemonDao();
 
@@ -57,6 +66,9 @@ public class TrainedPokemonDetailService {
 
     // アイテム一覧情報dao
     MItemDao mItemDao = new MItemDao();
+
+    // アイテム一覧情報dao
+    MBasicTypeDao mBasicTypeDao = new MBasicTypeDao();
 
     // 育成済みポケモンdao
     TTrainedPokemonDao tTrainedPokemonDao = new TTrainedPokemonDao();
@@ -89,6 +101,9 @@ public class TrainedPokemonDetailService {
         // どうぐ一覧をドロップダウンリストに設定する
         setItemList(comboBox.get(Constants.COMBO_BOX_ITEM_LIST));
 
+        // テラタイプ一覧をドロップダウンリストに設定する
+        setTeraTypeList(comboBox.get(Constants.COMBO_BOX_TERA_TYPE_LIST));
+
     }
 
     /**
@@ -101,23 +116,21 @@ public class TrainedPokemonDetailService {
      * @param textField
      * @throws IOException
      */
-    public void save(List<ComboBox<String>> comboBox, List<TextArea> textArea,
-            List<TextField> textField) throws IOException {
+    public Boolean save(List<ComboBox<String>> comboBox,
+            List<TextArea> textArea, List<TextField> textField)
+            throws IOException {
         // 登録前のチェック
         if (validation(comboBox)) {
-            // エラーが存在した場合、アラートダイアログ送出し、処理を行わない
-            FXMLLoader fxmlLoader = new FXMLLoader(
-                    getClass().getResource("/application/ValidateAlert.fxml"));
-            VBox validateAlertPane = (VBox) fxmlLoader.load();
+            // バリデーションに引っかかった場合、アラートを送出する
+            Alert alert = new Alert(AlertType.CONFIRMATION);
+            alert.setTitle("Error");
+            alert.setHeaderText("リストの中身を設定してください");
+            Optional<ButtonType> result = alert.showAndWait();
+//            if (result.isPresent() && result.get() == ButtonType.OK) {
+//                System.out.println("You clicked OK");
+//            }
 
-            Stage validateAlertStage = new Stage();
-
-            Scene validateAlertScene = new Scene(validateAlertPane);
-            validateAlertStage.setTitle("PokemonPartyManagementTool");
-            validateAlertStage.setScene(validateAlertScene);
-            validateAlertStage.show();
-
-            return;
+            return false;
         }
         // 名前から変換したIDを保存するデータ型を準備
         List<List<String>> idsByName = new ArrayList<>();
@@ -127,6 +140,8 @@ public class TrainedPokemonDetailService {
 
         // ローカルDBに取得した値を設定
         regist(idsByName, textArea, textField);
+
+        return true;
     }
 
     private void regist(List<List<String>> idsByName, List<TextArea> textArea,
@@ -261,6 +276,11 @@ public class TrainedPokemonDetailService {
         }
         insertParams.add(Constants.INSERT_PARAM_MOVE_ID_4, moveId4);
 
+        // TERA_TYPE
+        insertParams.add(Constants.INSERT_PARAM_TERA_TYPE,
+                idsByName.get(Constants.COMBO_BOX_TERA_TYPE_LIST)
+                        .get(Constants.ITEM_ID));
+
         tTrainedPokemonDao.insertTTrainedPokemon(insertParams);
     }
 
@@ -282,6 +302,8 @@ public class TrainedPokemonDetailService {
                 || comboBox.get(Constants.COMBO_BOX_ITEM_LIST)
                         .getValue() == null
                 || comboBox.get(Constants.COMBO_BOX_POKEMON_ABILITY_LIST)
+                        .getValue() == null
+                || comboBox.get(Constants.COMBO_BOX_TERA_TYPE_LIST)
                         .getValue() == null) {
             return true;
         }
@@ -314,6 +336,11 @@ public class TrainedPokemonDetailService {
         // 画面で設定した特性名からIDを取得
         getIdByPokemonAbility(comboBox
                 .get(Constants.COMBO_BOX_POKEMON_ABILITY_LIST).getValue(),
+                idsByName);
+
+        // 画面で設定したテラスタイプ名からIDを取得
+        getIdByTeraType(
+                comboBox.get(Constants.COMBO_BOX_TERA_TYPE_LIST).getValue(),
                 idsByName);
     }
 
@@ -416,6 +443,29 @@ public class TrainedPokemonDetailService {
     }
 
     /**
+     * 画面で設定したテラスタイプ名からIDを取得する
+     * 
+     * @param abilityName 画面で設定したテラスタイプ名
+     * @param idsByName   取得したIDを保持する変数
+     */
+    private void getIdByTeraType(String teraTypeName,
+            List<List<String>> idsByName) {
+
+        // 名前から変換したIDを保存するデータ型を準備
+        List<String> basicTypeId = new ArrayList<>();
+
+        for (MBasicTypeEntity globalMBasicTypeEntity : globalMBasicTypeEntityList) {
+            if (teraTypeName.equals(globalMBasicTypeEntity.getName())) {
+                // 名前が一致した場合、IDを取得してループを終える
+                basicTypeId.add(globalMBasicTypeEntity.getId());
+                break;
+            }
+        }
+        // IDリストに取得したIDをセット
+        idsByName.add(Constants.COMBO_BOX_TERA_TYPE_LIST, basicTypeId);
+    }
+
+    /**
      * ポケモンの名前を選択するコンボボックスの内容を設定する
      * 
      * @param pokemonNameList
@@ -498,6 +548,34 @@ public class TrainedPokemonDetailService {
         globalMItemEntityList = mItemEntityList;
     }
 
+    /**
+     * テラスタイプ一覧を選択するコンボボックスの内容を設定する。
+     * 
+     * @param teraTypeList
+     */
+    private void setTeraTypeList(ComboBox<String> teraTypeList) {
+
+        // 初期化
+        globalMBasicTypeEntityList = new ArrayList<>();
+
+        // ポケモン性格一覧をマスタテーブルから取得する
+        List<MBasicTypeEntity> mBasicTypeEntityList = mBasicTypeDao
+                .selectMBasicType();
+
+        // ポケモンの性格一覧をドロップダウンリストに設定する
+        for (MBasicTypeEntity mBasictTypeEntity : mBasicTypeEntityList) {
+            teraTypeList.getItems().add(mBasictTypeEntity.getName());
+        }
+
+        // 画面のデータリストに格納
+        globalMBasicTypeEntityList = mBasicTypeEntityList;
+    }
+
+    /**
+     * テキストエリアの入力制限を設定する
+     * 
+     * @param textArea
+     */
     public void setTextAreaRestrictions(List<TextArea> textArea) {
         TextUtil.setTextAreaRestrictions(
                 textArea.get(Constants.TEXT_AREA_HP_EFFORT_VALUE));

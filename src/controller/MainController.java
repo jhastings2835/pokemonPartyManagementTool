@@ -5,21 +5,24 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.ResourceBundle;
-import java.util.concurrent.ArrayBlockingQueue;
 
 import common.DataBaseUtil;
 import dao.MAbilityDao;
-import dao.TTrainedPokemonDao;
 import dto.PokemonDetailDto;
 import javafx.event.ActionEvent;
+import javafx.event.EventHandler;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.fxml.Initializable;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
+import javafx.scene.control.Alert.AlertType;
 import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.scene.control.cell.PropertyValueFactory;
+import javafx.scene.input.MouseButton;
+import javafx.scene.input.MouseEvent;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import service.MainService;
@@ -43,6 +46,9 @@ public class MainController implements Initializable {
 
     @FXML
     private TableColumn<PokemonDetailDto, String> item;
+
+    @FXML
+    private TableColumn<PokemonDetailDto, String> teraType;
 
     @FXML
     private TableColumn<PokemonDetailDto, String> hitPointsEffortValue;
@@ -80,15 +86,22 @@ public class MainController implements Initializable {
     public void initialize(URL location, ResourceBundle resources) {
         setMasterDatas();
         setTableColumns();
+        setTabelResultDoubleClickEvent();
     }
 
     /**
      * マスタデータを設定する。
      */
     private void setMasterDatas() {
-        // TODO 自動生成されたメソッド・スタブ
         MAbilityDao mAbilityDao = new MAbilityDao();
         DataBaseUtil.mAbilityEntityList = mAbilityDao.selectMAbility();
+    }
+
+    /**
+     * ダブルクリックイベントを検知できるように設定する
+     */
+    private void setTabelResultDoubleClickEvent() {
+        mainService.setTabelResultDoubleClickEvent(tableResultList);
     }
 
     @FXML
@@ -127,6 +140,8 @@ public class MainController implements Initializable {
                         "abilityName"));
         item.setCellValueFactory(
                 new PropertyValueFactory<PokemonDetailDto, String>("itemName"));
+        teraType.setCellValueFactory(
+                new PropertyValueFactory<PokemonDetailDto, String>("teraType"));
         hitPointsEffortValue.setCellValueFactory(
                 new PropertyValueFactory<PokemonDetailDto, String>(
                         "hitPointsEffortValue"));
