@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
+import controller.TrainedPokemonDetailController;
 import dao.TTrainedPokemonDao;
 import dto.PokemonDetailDto;
 import javafx.event.EventHandler;
@@ -25,7 +26,7 @@ public class MainService {
     }
 
     public void setTabelResultDoubleClickEvent(
-            TableView<PokemonDetailDto> tableResultList) {
+            TableView<PokemonDetailDto> tableResultList, Stage stage) {
         tableResultList.setOnMouseClicked(new EventHandler<MouseEvent>() {
             @Override
             public void handle(MouseEvent event) {
@@ -45,6 +46,17 @@ public class MainService {
                     }
 
                     Stage secondStage = new Stage();
+
+                    // ダブルクリックで選択した値を取得
+                    PokemonDetailDto pokemonDetailDto = tableResultList
+                            .getSelectionModel().getSelectedItem();
+                    int id = pokemonDetailDto.getId();
+
+                    TrainedPokemonDetailController trainedPokemonDetailController = fxmlLoader
+                            .getController();
+
+                    // 育成済みポケモンＩＤを渡して表示
+                    trainedPokemonDetailController.setInitValue(stage, id);
 
                     Scene secondScene = new Scene(secondPane);
                     secondStage.setTitle("PokemonPartyManagementTool");

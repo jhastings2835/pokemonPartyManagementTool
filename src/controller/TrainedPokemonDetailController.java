@@ -20,10 +20,12 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.TextField;
+import javafx.stage.Stage;
 import model.MItemEntity;
 import model.MPersonalityEntity;
 import model.MPokemonAbilityEntity;
 import model.MPokemonEntity;
+import model.TTrainedPokemonEntity;
 import service.TrainedPokemonDetailService;
 
 public class TrainedPokemonDetailController implements Initializable {
@@ -87,6 +89,10 @@ public class TrainedPokemonDetailController implements Initializable {
 
     private List<TextField> textField = new ArrayList<>();
 
+    private Stage trainedPokemonDetailStage = new Stage();
+
+    private int trainedPokemonId = -1;
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         // 一覧データ初期化
@@ -94,9 +100,6 @@ public class TrainedPokemonDetailController implements Initializable {
 
         // コンボボックス配列にコンボボックスを設定
         this.addComboBoxList();
-
-        // コンボボックスの初期表示値を設定
-        trainedPokemonDetailService.setComboBoxValues(comboBox);
 
         // テキストエリア配列にテキストエリアを設定
         this.addTextAreaList();
@@ -106,6 +109,95 @@ public class TrainedPokemonDetailController implements Initializable {
 
         // テキストエリアの入力制限を追加
         trainedPokemonDetailService.setTextAreaRestrictions(textArea);
+
+        // コンボボックスの初期表示値を設定
+        trainedPokemonDetailService.setComboBoxValues(comboBox);
+    }
+
+    /**
+     * 初期化に必要な引数をセット
+     * 
+     * @param secondStage
+     * @param id
+     */
+    public void setInitValue(Stage secondStage, int id) {
+        this.trainedPokemonDetailStage = secondStage;
+        this.trainedPokemonId = id;
+
+        if (this.trainedPokemonId != -1) {
+            // 育成済みポケモンＩＤが存在する場合、値を設定する
+            TTrainedPokemonEntity tTrainedPokemonEntity = trainedPokemonDetailService
+                    .getInfosById(this.trainedPokemonId);
+
+            // IDからポケモンの名前を取得
+            String pokemonName = trainedPokemonDetailService
+                    .getPokemonNameByIds(tTrainedPokemonEntity.getPokemonId(),
+                            tTrainedPokemonEntity.getPokemonFormId());
+            // 取得したポケモンの名前を初期値としてセット
+            this.pokemonNameList.getSelectionModel().select(pokemonName);
+
+            // ＩＤから性格を取得
+            String personalityName = trainedPokemonDetailService
+                    .getPersonalityNameById(
+                            tTrainedPokemonEntity.getPersonalityId());
+            // 取得した性格の名前を初期値としてセット
+            this.pokemonPersonalityList.getSelectionModel()
+                    .select(personalityName);
+
+            // ＩＤからアイテムを取得
+            String itemName = trainedPokemonDetailService
+                    .getItemNameById(tTrainedPokemonEntity.getItemId());
+            // 取得したアイテムの名前を初期値としてセット
+            this.itemList.getSelectionModel().select(itemName);
+
+            // ＩＤから特性を取得
+            String abilityName = trainedPokemonDetailService
+                    .getabilityNameById(tTrainedPokemonEntity.getAbilityId());
+            // 取得した特性の名前を初期値としてセット
+            this.pokemonAbilityList.getSelectionModel().select(abilityName);
+
+            // ＩＤからテラスタイプを取得
+            String teraType = trainedPokemonDetailService
+                    .getTeraTypeById(tTrainedPokemonEntity.getTeraType());
+            // 取得したテラスタイプの名前を初期値としてセット
+            this.teraTypeList.getSelectionModel().select(teraType);
+
+            // 取得したHP努力値をテキストエリアに設定
+            this.hpEffortValueForm
+                    .setText(tTrainedPokemonEntity.getHitPointsEffortValue());
+
+            // 取得した攻撃努力値をテキストエリアに設定
+            this.attackEffortValueForm
+                    .setText(tTrainedPokemonEntity.getAttackEffortValue());
+
+            // 取得した防御努力値をテキストエリアに設定
+            this.defenseEffortValueForm
+                    .setText(tTrainedPokemonEntity.getDefenseEffortValue());
+
+            // 取得した特攻努力値をテキストエリアに設定
+            this.specialAttackEffortValueForm.setText(
+                    tTrainedPokemonEntity.getSpecialAttackEffortValue());
+
+            // 取得した特防努力値をテキストエリアに設定
+            this.specialDefenseEffortValueForm.setText(
+                    tTrainedPokemonEntity.getSpecialDefenseEffortValue());
+
+            // 取得したすばやさ努力値をテキストエリアに設定
+            this.speedEffortValueForm
+                    .setText(tTrainedPokemonEntity.getSpeedEffortValue());
+
+            // 取得したわざ1をテキストエリアに設定
+            this.move1Form.setText(tTrainedPokemonEntity.getMoveId1());
+
+            // 取得したわざ2をテキストエリアに設定
+            this.move2Form.setText(tTrainedPokemonEntity.getMoveId2());
+
+            // 取得したわざ3をテキストエリアに設定
+            this.move3Form.setText(tTrainedPokemonEntity.getMoveId3());
+
+            // 取得したわざ4をテキストエリアに設定
+            this.move4Form.setText(tTrainedPokemonEntity.getMoveId4());
+        }
     }
 
     /**

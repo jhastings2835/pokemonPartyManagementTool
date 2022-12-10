@@ -2,6 +2,8 @@ package dto;
 
 public class PokemonDetailDto {
 
+    private int id;
+
     private String name;
 
     private String personalityName;
@@ -31,6 +33,14 @@ public class PokemonDetailDto {
     private String move4Name;
 
     private String teraType;
+
+    public int getId() {
+        return id;
+    }
+
+    public void setId(int id) {
+        this.id = id;
+    }
 
     public String getName() {
         return name;

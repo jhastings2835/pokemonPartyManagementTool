@@ -36,6 +36,8 @@ public class TTrainedPokemonEntity extends DataBaseModel {
 
     private String moveId4;
 
+    private String teraType;
+
     public int getId() {
         return id;
     }
@@ -170,6 +172,14 @@ public class TTrainedPokemonEntity extends DataBaseModel {
 
     public void setMoveId4(String moveId4) {
         this.moveId4 = moveId4;
+    }
+
+    public String getTeraType() {
+        return teraType;
+    }
+
+    public void setTeraType(String teraType) {
+        this.teraType = teraType;
     }
 
 }

@@ -82,11 +82,18 @@ public class MainController implements Initializable {
 
     private final MainService mainService = new MainService();
 
+    private Stage stage = new Stage();
+
     @Override
     public void initialize(URL location, ResourceBundle resources) {
         setMasterDatas();
         setTableColumns();
         setTabelResultDoubleClickEvent();
+    }
+
+    public void setInitValue(Stage stage) {
+        // TODO 自動生成されたメソッド・スタブ
+        this.stage = stage;
     }
 
     /**
@@ -101,9 +108,14 @@ public class MainController implements Initializable {
      * ダブルクリックイベントを検知できるように設定する
      */
     private void setTabelResultDoubleClickEvent() {
-        mainService.setTabelResultDoubleClickEvent(tableResultList);
+        mainService.setTabelResultDoubleClickEvent(tableResultList, this.stage);
     }
 
+    /**
+     * 一覧データ検索後、表示
+     * 
+     * @param event
+     */
     @FXML
     void actLoad(ActionEvent event) {
         List<PokemonDetailDto> pokemonDetailDtoList = new ArrayList<>();
@@ -112,6 +124,12 @@ public class MainController implements Initializable {
         tableResultList.getItems().addAll(pokemonDetailDtoList);
     }
 
+    /**
+     * 育成済みポケモン詳細画面を表示
+     * 
+     * @param event
+     * @throws IOException
+     */
     @FXML
     void showAddTrainedPokemon(ActionEvent event) throws IOException {
 
@@ -121,7 +139,14 @@ public class MainController implements Initializable {
 
         Stage secondStage = new Stage();
 
+        TrainedPokemonDetailController trainedPokemonDetailController = fxmlLoader
+                .getController();
+
+        // 育成済みポケモンＩＤなしで表示
+        trainedPokemonDetailController.setInitValue(this.stage, -1);
+
         Scene secondScene = new Scene(secondPane);
+        secondStage.initOwner(this.stage);
         secondStage.setTitle("PokemonPartyManagementTool");
         secondStage.setScene(secondScene);
         secondStage.show();

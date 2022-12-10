@@ -34,6 +34,7 @@ import model.MItemEntity;
 import model.MPersonalityEntity;
 import model.MPokemonAbilityEntity;
 import model.MPokemonEntity;
+import model.TTrainedPokemonEntity;
 
 public class TrainedPokemonDetailService {
 
@@ -103,7 +104,18 @@ public class TrainedPokemonDetailService {
 
         // テラタイプ一覧をドロップダウンリストに設定する
         setTeraTypeList(comboBox.get(Constants.COMBO_BOX_TERA_TYPE_LIST));
+    }
 
+    /**
+     * 育成済みポケモンＩＤが設定されていた場合の値を設定する。
+     * 
+     * @param trainedPokemonId
+     */
+    public TTrainedPokemonEntity getInfosById(int trainedPokemonId) {
+        // TODO 自動生成されたメソッド・スタブ
+        TTrainedPokemonEntity tTrainedPokemonEntity = tTrainedPokemonDao
+                .selectTTrainedPokemonById(trainedPokemonId);
+        return tTrainedPokemonEntity;
     }
 
     /**
@@ -126,9 +138,6 @@ public class TrainedPokemonDetailService {
             alert.setTitle("Error");
             alert.setHeaderText("リストの中身を設定してください");
             Optional<ButtonType> result = alert.showAndWait();
-//            if (result.isPresent() && result.get() == ButtonType.OK) {
-//                System.out.println("You clicked OK");
-//            }
 
             return false;
         }
@@ -682,5 +691,25 @@ public class TrainedPokemonDetailService {
         }
 
         return name;
+    }
+
+    public String getPokemonNameByIds(String pokemonId, String pokemonFormId) {
+        return mPokemonDao.selectMPokemonByIds(pokemonId, pokemonFormId);
+    }
+
+    public String getPersonalityNameById(String personalityId) {
+        return mPokemonPersonalityDao.selectMPersonalityById(personalityId);
+    }
+
+    public String getItemNameById(String itemId) {
+        return mItemDao.selectMItemById(itemId);
+    }
+
+    public String getabilityNameById(String abilityId) {
+        return mAbilityDao.selectMAbilityById(abilityId);
+    }
+
+    public String getTeraTypeById(String teraType) {
+        return mBasicTypeDao.selectMBasicTypeById(teraType);
     }
 }
